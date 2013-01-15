@@ -228,15 +228,39 @@
 	
 }
 
-- (void)egoRefreshScrollViewDataSourceDidFinishedLoading:(UIScrollView *)scrollView {
-	
-    [UIView animateWithDuration:0.3 animations:^ {
-        [scrollView setContentInset:UIEdgeInsetsMake(0.0f, 0.0f, 0.0f, 0.0f)];
-    }];
-	
-	[self setState:EGOOPullRefreshNormal];
-    
+- (void)egoRefreshScrollViewDataSourceDidStartedLoading:(UIScrollView *)scrollView animated:(BOOL)animated
+{
+    if (_state != EGOOPullRefreshLoading) {
+        [self setState:EGOOPullRefreshLoading];
+        if (animated) {
+            [UIView animateWithDuration:0.2 animations:^{
+                scrollView.contentInset = UIEdgeInsetsMake(60.0f, 0.0f, 0.0f, 0.0f);
+            }];
+        }
+        else {
+            scrollView.contentInset = UIEdgeInsetsMake(60.0f, 0.0f, 0.0f, 0.0f);
+        }
+    }
 }
 
+- (void)egoRefreshScrollViewDataSourceDidFinishedLoading:(UIScrollView *)scrollView animated:(BOOL)animated{
+
+    if (animated) {
+        [UIView animateWithDuration:0.2 animations:^{
+            scrollView.contentInset = UIEdgeInsetsZero;
+        } completion:^(BOOL finished){
+            [self setState:EGOOPullRefreshNormal];
+        }];
+    }
+    else {
+        scrollView.contentInset = UIEdgeInsetsZero;
+        [self setState:EGOOPullRefreshNormal];
+    }
+}
+
+- (void)egoRefreshScrollViewDataSourceDidFinishedLoading:(UIScrollView *)scrollView {
+
+    [self egoRefreshScrollViewDataSourceDidFinishedLoading:scrollView animated:YES];
+}
 
 @end
